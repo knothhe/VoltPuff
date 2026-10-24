@@ -1,0 +1,17 @@
+{
+  "name": "VoltPuff",
+  "identifier": "com.knothhe.voltpuff",
+  "version": "0.1.0",
+  "copyright": "Copyright © 2026 knothhe",
+  "icon": "assets/icon.png",
+  "main": ".",
+  "out": "build",
+  "macos": {
+    "minimumSystemVersion": "13.0",
+    "infoPlist": {
+      "LSUIElement": true,
+      "CFBundleDisplayName": "VoltPuff · 电团团",
+      "NSHumanReadableCopyright": "Copyright © 2026 knothhe"
+    }
+  }
+}
