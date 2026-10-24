@@ -16,7 +16,9 @@ import (
 	"github.com/knothhe/VoltPuff/internal/battery"
 )
 
-const version = "0.1.0"
+const version = "0.1.1"
+
+var dismissIcon = ui.MustParseSVG([]byte(`<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path d="M4 4L12 12M12 4L4 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`))
 
 //go:embed assets/tray.png
 var trayPNG []byte
@@ -36,9 +38,11 @@ type puff struct {
 	loading              bool
 	quitting             bool
 	visibilityGeneration uint64
+	showAtStart          bool
 }
 
 func main() {
+	showPanel := flag.Bool("show", false, "open the panel after launch; the default starts in the menu bar only")
 	list := flag.Bool("list", false, "print accessory batteries as JSON without starting the GUI")
 	showVersion := flag.Bool("version", false, "print the version")
 	flag.Parse()
@@ -64,7 +68,7 @@ func main() {
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	s := &puff{ctx: ctx, cancel: cancel}
+	s := &puff{ctx: ctx, cancel: cancel, showAtStart: *showPanel}
 	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { s.quitting = true; s.cancel() })
 	mygo.App.OnSecondInstance(func([]string, string) {
 		if s.win != nil {
@@ -84,7 +88,7 @@ func (s *puff) ready() {
 		log.Fatal(err)
 	}
 	s.tray, err = mygo.NewTray(mygo.TrayOptions{
-		ID:   "com.knothhe.voltpuff.battery",
+		ID:   "voltpuff.knothhe.com.battery",
 		Icon: trayPNG, IconIsTemplate: true,
 		ToolTip: "电团团 · 正在查看小伙伴的电量…",
 	})
@@ -127,7 +131,10 @@ func (s *puff) ready() {
 		s.tray.PopUpMenu()
 	})
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { s.tray.Destroy() })
-	s.show()
+	s.refresh()
+	if s.showAtStart {
+		s.show()
+	}
 	go func() {
 		ticker := time.NewTicker(time.Minute)
 		defer ticker.Stop()
@@ -211,8 +218,12 @@ func (s *puff) dismissAfterBlur() {
 func (s *puff) show() {
 	s.visibilityGeneration++
 	a := s.tray.Bounds()
-	if a.Width == 0 {
-		s.win.Center()
+	if a.Width <= 0 || a.Height <= 0 {
+		// A just-created status item may not have a frame yet. Keep an
+		// explicit show request near the menu bar until its anchor is ready.
+		area := mygo.Screen.PrimaryDisplay().WorkArea
+		b := s.win.Bounds()
+		s.win.SetPosition(area.X+max(0, area.Width-b.Width-12), area.Y+8)
 	} else {
 		area := mygo.Screen.DisplayNearestPoint(mygo.Point{X: a.X + a.Width/2, Y: a.Y + a.Height/2}).WorkArea
 		b := s.win.Bounds()
@@ -253,8 +264,16 @@ func (s *puff) view(c *ui.Context) {
 				ui.Text(c, "VoltPuff").FontSize(22).Bold()
 				ui.Text(c, "电团团 · 陪你安心用电").FontSize(11).TextColor(t.TextMuted)
 			})
-			ui.Button(c, "×").Size(30, 30).Label("收起面板").
+			close := ui.ButtonBase(c.Key("dismiss-panel")).Size(28, 28).Shrink(0).
+				Radius(8).TextColor(t.TextMuted).Label("收起面板").
 				Tooltip("收起面板，电团团继续在菜单栏运行").OnClick(s.dismiss)
+			if close.Hovered() {
+				close.Background(t.SurfaceHover).TextColor(t.Text)
+			}
+			if close.Pressed() {
+				close.Background(t.SurfacePressed)
+			}
+			close.Children(func() { ui.Icon(c, dismissIcon).Size(12, 12) })
 		})
 		ui.Column(c).Gap(4).Children(func() {
 			ui.Textf(c, "%d 位小伙伴", len(s.devices)).FontSize(14).Bold()

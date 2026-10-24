@@ -1,7 +1,7 @@
 {
   "name": "VoltPuff",
-  "identifier": "com.knothhe.voltpuff",
-  "version": "0.1.0",
+  "identifier": "voltpuff.knothhe.com",
+  "version": "0.1.1",
   "copyright": "Copyright © 2026 knothhe",
   "icon": "assets/icon.png",
   "main": ".",
@@ -12,6 +12,7 @@
       "LSUIElement": true,
       "CFBundleDisplayName": "VoltPuff · 电团团",
       "NSHumanReadableCopyright": "Copyright © 2026 knothhe"
-    }
+    },
+    "signingIdentity": "E10DFA9F3B6BA09808805116D499256837FD8EF4"
   }
 }

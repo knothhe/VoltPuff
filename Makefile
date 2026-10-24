@@ -1,5 +1,8 @@
 VERSION := $(shell /usr/bin/plutil -extract version raw mygo.json)
 MYGO := go run github.com/egoist/mygo/cmd/mygo
+# Empty uses the fixed identity in mygo.json; SIGN=- opts into ad-hoc builds.
+SIGN ?=
+SIGN_FLAG := $(if $(SIGN),-sign "$(SIGN)",)
 APP := build/darwin-universal/VoltPuff.app
 PREFIX := VoltPuff-$(VERSION)-macOS-universal
 
@@ -25,7 +28,7 @@ check: test
 	go vet ./...
 
 build:
-	$(MYGO) build -platform darwin/universal
+	$(MYGO) build -platform darwin/universal $(SIGN_FLAG)
 
 release: check build
 	mkdir -p dist

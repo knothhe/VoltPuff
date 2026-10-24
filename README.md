@@ -12,7 +12,7 @@
 
 从 [Releases](https://github.com/knothhe/VoltPuff/releases/latest) 下载 Universal DMG 或 ZIP，支持 Apple Silicon 和 Intel Mac，系统要求 macOS 13 或更新版本。
 
-打开 DMG，将 **VoltPuff.app** 拖进「应用程序」，然后启动。应用只显示菜单栏图标，不显示 Dock 图标。
+打开 DMG，将 **VoltPuff.app** 拖进「应用程序」，然后启动。首次启动只显示菜单栏图标，不主动弹出面板，也不显示 Dock 图标；点击菜单栏的小团子才会展开电量面板。
 
 - 点击小团子，查看设备名称、电量和充电状态。
 - 菜单栏显示当前设备中的最低电量；20% 及以下的设备显示暖色提示。
@@ -21,7 +21,20 @@
 - 右键图标可以打开面板、刷新或退出。
 - 单实例运行，避免创建多个菜单栏图标。
 
-v0.1.0 使用 ad-hoc 签名，尚未经过 Apple Developer ID 签名和公证。从网上下载后，macOS Gatekeeper 可能阻止首次启动；可在确认来源后，通过「系统设置 → 隐私与安全性 → 仍要打开」允许启动。也可以在自己的 Mac 上从源码构建。
+### 首次安装：移除下载隔离属性
+
+当前发布包使用固定的本地证书签名，**没有 Apple Developer ID 签名和公证**，macOS 可能提示无法验证开发者或阻止打开。
+
+确认应用来自[本仓库的 Releases](https://github.com/knothhe/VoltPuff/releases)，并把 `VoltPuff.app` 拖入「应用程序」后，在终端执行：
+
+```sh
+xattr -dr com.apple.quarantine /Applications/VoltPuff.app
+open /Applications/VoltPuff.app
+```
+
+此命令只移除这个应用的下载隔离属性。也可以通过「系统设置 → 隐私与安全性 → 仍要打开」允许启动，或从源码构建。
+
+应用的固定 Bundle ID 为 `voltpuff.knothhe.com`。
 
 ## 电量来源
 
@@ -48,11 +61,18 @@ make build    # Universal .app 和 .dmg → build/darwin-universal/
 make release  # DMG、ZIP 和 SHA256SUMS → dist/
 ```
 
-`make release` 会先检查代码，再构建 Apple Silicon / Intel 通用应用并生成校验文件。运行 `make icons` 可重新生成图标；原始绘图代码位于 `internal/artwork`。
+`make release` 会先检查代码，再构建 Apple Silicon / Intel 通用应用并生成校验文件。
+
+默认固定使用 `mygo.json` 中的本地代码签名证书：`Knothhe Local Code Signing`，证书 SHA-1 为 `E10DFA9F3B6BA09808805116D499256837FD8EF4`；不向仓库提交私钥或证书。
+
+其他开发者没有这个证书时，可使用 `make build SIGN=-` 或 `make release SIGN=-` 做 ad-hoc 构建，也可以用 `SIGN="自己的签名身份"` 指定证书。
+
+运行 `make icons` 可重新生成图标；原始绘图代码位于 `internal/artwork`。
 
 也可以通过命令行使用相同的读取逻辑：
 
 ```sh
+go run . -show       # 显式展开面板；默认启动仅显示菜单栏图标
 go run . -list       # JSON，不启动图形界面
 go run . -version
 # 打包后：
