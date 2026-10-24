@@ -25,14 +25,23 @@
 
 当前发布包使用固定的本地证书签名，**没有 Apple Developer ID 签名和公证**，macOS 可能提示无法验证开发者或阻止打开。
 
-确认应用来自[本仓库的 Releases](https://github.com/knothhe/VoltPuff/releases)，并把 `VoltPuff.app` 拖入「应用程序」后，在终端执行：
+确认安装包来自[本仓库的 Releases](https://github.com/knothhe/VoltPuff/releases) 后，根据被拦截的文件处理。
+
+**如果 DMG 本身被拦截**，例如提示「VoltPuff-0.1.1-macOS-universal.dmg Not Opened」，先在终端移除 DMG 的下载隔离属性，再打开它。以下以 v0.1.1 和默认「下载」文件夹为例；版本或保存位置不同时，请替换成实际文件路径：
+
+```sh
+xattr -d com.apple.quarantine "$HOME/Downloads/VoltPuff-0.1.1-macOS-universal.dmg"
+open "$HOME/Downloads/VoltPuff-0.1.1-macOS-universal.dmg"
+```
+
+**如果应用被拦截**，打开 DMG 并将 `VoltPuff.app` 拖入「应用程序」后，再在终端执行：
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/VoltPuff.app
 open /Applications/VoltPuff.app
 ```
 
-此命令只移除这个应用的下载隔离属性。也可以通过「系统设置 → 隐私与安全性 → 仍要打开」允许启动，或从源码构建。
+上述命令只移除指定 DMG 或应用的下载隔离属性。也可以通过「系统设置 → 隐私与安全性 → 仍要打开」允许打开，或从源码构建。
 
 应用的固定 Bundle ID 为 `voltpuff.knothhe.com`。
 
