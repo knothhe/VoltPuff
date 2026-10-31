@@ -6,7 +6,7 @@
 
 使用 [MyGo](https://github.com/egoist/mygo) 原生 UI 和 Go 编写。
 
-<img src="docs/preview.png" width="380" alt="VoltPuff 电量面板：设备名称、百分比和低电量提示">
+<img src="docs/preview.png" width="300" alt="VoltPuff 电量面板：设备类型、电量、电池图标和低电量提示">
 
 ## 下载与使用
 
@@ -14,10 +14,10 @@
 
 打开 DMG，将 **VoltPuff.app** 拖进「应用程序」，然后启动。首次启动只显示菜单栏图标，不主动弹出面板，也不显示 Dock 图标；点击菜单栏的小团子才会展开电量面板。
 
-- 点击小团子，查看设备名称、电量和充电状态。
-- 菜单栏显示当前设备中的最低电量；20% 及以下的设备显示暖色提示。
-- 每分钟自动刷新，打开面板时也会刷新，还可以点击「刷新」。
-- 右上角「×」、点击面板之外、Escape 和 Command-W 都只收起面板，程序继续在菜单栏运行。只有右键菜单中的「退出电团团」或 Command-Q 才会结束程序。
+- 点击小团子，查看每台设备的类型、电量和充电状态；面板高度随设备数量变化。
+- 菜单栏显示当前设备中的最低电量；20% 及以下的设备以橙色提示，充电中的设备显示绿色。
+- 每分钟自动刷新，打开面板时也会刷新，还可以点击面板右上角的刷新按钮。
+- 点击面板之外、再次点击图标、Escape 和 Command-W 都只收起面板，程序继续在菜单栏运行。只有面板底部的「退出」、右键菜单中的「退出电团团」或 Command-Q 才会结束程序。
 - 右键图标可以打开面板、刷新或退出。
 - 单实例运行，避免创建多个菜单栏图标。
 
@@ -83,6 +83,7 @@ make release  # DMG、ZIP 和 SHA256SUMS → dist/
 ```sh
 go run . -show       # 显式展开面板；默认启动仅显示菜单栏图标
 go run . -list       # JSON，不启动图形界面
+go run . -mock low   # 用模拟数据预览面板：normal、low、charging、many、empty、error、error-empty、loading
 go run . -version
 # 打包后：
 ./build/darwin-universal/VoltPuff.app/Contents/MacOS/VoltPuff -list
