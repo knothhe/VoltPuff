@@ -10,7 +10,7 @@
 
 ## 下载与使用
 
-从 [Releases](https://github.com/knothhe/VoltPuff/releases/latest) 下载 Universal DMG 或 ZIP，支持 Apple Silicon 和 Intel Mac，系统要求 macOS 13 或更新版本。
+从 [Releases](https://github.com/knothhe/VoltPuff/releases/latest) 下载 Universal DMG，支持 Apple Silicon 和 Intel Mac，系统要求 macOS 13 或更新版本。
 
 打开 DMG，将 **VoltPuff.app** 拖进「应用程序」，然后启动。首次启动只显示菜单栏图标，不主动弹出面板，也不显示 Dock 图标；点击菜单栏的小团子才会展开电量面板。
 
@@ -67,10 +67,12 @@ VoltPuff 每次只执行 macOS 自带的只读命令：
 make run      # 开发运行
 make check    # 测试、格式与 go vet
 make build    # Universal .app 和 .dmg → build/darwin-universal/
-make release  # DMG、ZIP 和 SHA256SUMS → dist/
+make release  # 唯一 Universal DMG 和 SHA256SUMS → dist/
 ```
 
-`make release` 会先检查代码，再构建 Apple Silicon / Intel 通用应用并生成校验文件。
+`make release` 会先检查代码，再构建 Apple Silicon / Intel 通用应用；清理 `dist/` 中之前的 VoltPuff Universal DMG、ZIP 和校验文件，生成唯一 DMG 和只包含该 DMG 的 `SHA256SUMS`。安装与升级均通过 DMG 手动完成。
+
+下载 DMG 和同一版本的 `SHA256SUMS` 后，可在下载目录执行 `shasum -a 256 -c SHA256SUMS` 校验安装包。
 
 默认固定使用 `mygo.json` 中的本地代码签名证书：`Knothhe Local Code Signing`，证书 SHA-1 为 `E10DFA9F3B6BA09808805116D499256837FD8EF4`；不向仓库提交私钥或证书。
 
