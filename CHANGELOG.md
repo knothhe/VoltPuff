@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- macOS 分发收敛为唯一 Universal DMG 和 SHA-256 校验文件，不再生成 ZIP；同时保留 Apple Silicon 和 Intel 支持。
+
 ## v0.1.2 — 2026-10-31
 
 - 重新设计菜单栏面板：宽度 300，高度随设备数量变化，使用系统弹出面板的半透明材质。
